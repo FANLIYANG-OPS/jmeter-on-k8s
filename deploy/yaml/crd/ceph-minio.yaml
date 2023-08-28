@@ -1,0 +1,27 @@
+apiVersion: jmeter.zs.com/v1
+kind: Jmeter
+metadata:
+  labels:
+    app.kubernetes.io/name: jmeter
+    app.kubernetes.io/instance: jmeter-sample
+    app.kubernetes.io/part-of: jmeter
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: jmeter
+  name: jmeter-sample
+  namespace: middleware-jmeter
+spec:
+  instances: 3
+  configStorage:
+    storageClassName: csi-minio-s3
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+  dataStorage:
+    storageClassName: csi-minio-s3
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi

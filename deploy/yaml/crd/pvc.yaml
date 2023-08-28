@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/created-by: jmeter
+    app.kubernetes.io/instance: jmeter-sample
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: jmeter
+    app.kubernetes.io/part-of: jmeter
+  name: share-data
+  namespace: middleware-jmeter
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: csi-minio-s3
+  volumeMode: Filesystem

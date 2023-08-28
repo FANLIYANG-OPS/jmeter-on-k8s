@@ -1,0 +1,7 @@
+FROM library/openjdk:8u322
+RUN mkdir -p /opt/config /opt/report /opt/apache-jmeter-5.4.1
+COPY apache-jmeter-5.4.1/ /opt/apache-jmeter-5.4.1
+RUN chmod +x /opt/apache-jmeter-5.4.1/bin/jmeter
+COPY start.sh /opt
+RUN chmod +x /opt/start.sh
+WORKDIR /opt
