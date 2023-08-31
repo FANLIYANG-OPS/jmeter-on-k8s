@@ -1,3 +1,0 @@
-/home/fly/jmeter-on-k8s/build/CMakeFiles/cache_1_0_0.dir
-/home/fly/jmeter-on-k8s/build/CMakeFiles/edit_cache.dir
-/home/fly/jmeter-on-k8s/build/CMakeFiles/rebuild_cache.dir
