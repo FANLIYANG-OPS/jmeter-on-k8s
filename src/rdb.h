@@ -36,4 +36,27 @@
 #define CACHE_RDB_OPCODE_SELECTDB 254
 #define CACHE_RDB_OPCODE_EOF 255
 
+int rdbSaveType(rio *rdb, unsigned char type);
+int rdbLoadType(rio *rdb);
+int rdbSaveTime(rio *rdb, time_t t);
+time_t rdbLoadTime(rio *rdb);
+int rdbSaveLen(rio *rdb, uint32_t len);
+uint32_t rdbLoadLen(rio *rdb, int *isencoded);
+int rdbSaveObjectType(rio *rdb, cobj *o);
+int rdbLoadObjectType(rio *rdb);
+int rdbLoad(char *filename);
+int rdbSaveBackground(char *filename);
+int rdbSaveToSlavesSockets(void);
+void rdbRemoveTempFile(pid_t childpid);
+int rdbSave(char *filename);
+int rdbSaveObject(rio *rdb, cobj *o);
+
+off_t rdbSaveObjectLen(cobj *o);
+off_t rdbSavedObjectPages(cobj *o);
+cobj *rdbLoadObject(int type, rio *rdb);
+void backgroundSaveDoneHandler(int exitcode, int bysignal);
+int rdbSaveKeyValuePair(rio *rdb, cobj *key, cobj *val, long long expiretime,
+                        long long now);
+cobj *rdbLoadStringObject(rio *rdb);
+
 #endif

@@ -1001,4 +1001,85 @@ void stopLoading(void);
 
 #include "rdb.h"
 
+void flushAppendOnlyFile(int force);
+void feedAooendOnlyFile(struct cacheCommand *cmd, int dictid, cobj *argv,
+                        int argc);
+void aofRemoveTempFile(pid_t child_pid);
+int rewriteAppendOnlyFileBackground(void);
+int loadAppendOnlyFile(char *filename);
+void stopAppendOnly(void);
+int startAppendOnly(void);
+void backgroundRewriteDoneHandler(int exitcode, int bysignal);
+void aofRewriteBufferReset(void);
+unsigned long aofRewriteBufferSize(void);
+
+typedef struct {
+  double min, max;
+  int minex, maxex;
+} zrangespec;
+
+typedef struct {
+  cobj *min, *max;
+  int minex, maxex;
+} zlexrangespec;
+
+zskiplist *zslCreate(void);
+void zslFree(zskiplist *zsl);
+zskiplistNode *zslInsert(zskiplist *zsl, double score, cobj *obj);
+unsigned char *zzlInsert(unsigned char *zl, cobj *ele, double score);
+int zslDelete(zskiplist *zsl, double score, cobj *obj);
+zskiplistNode *zslFirstInRange(zskiplist *zsl, zrangespec *range);
+zskiplistNode *zslLastInRange(zskiplist *zsl, zrangespec *range);
+double zzlGetScore(unsigned char *sptr);
+void zzlNext(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);
+void zzlPrev(unsigned char *zl, unsigned char **eptr, unsigned char **sptr);
+unsigned int zsetLength(cobj *zobj);
+void zsetConvert(cobj *zobj, int encoding);
+unsigned long zslGetRank(zskiplist *zsl, double score, cobj *o);
+
+int freeMemoryIfNeeded(void);
+int processCommand(cacheClient *c);
+void setupSignalHandlers(void);
+struct cacheCommand *lookupCommand(Sds name);
+struct cacheCommand *lookupCommandByCString(char *s);
+struct cacheCommand *lookupCmmandOrOriginal(Sds name);
+void call(cacheClient *c, int flags);
+void propagate(struct cacheCommand *cmd, int dbid, cobj **argv, int argc,
+               int target);
+void alsoPropagate(struct cacheCommand *cmd, int dbid, cobj **argv, int argc,
+                   int target);
+void forceCommandPropagation(cacheClient *c, int flags);
+int prepareForShutdown(void);
+#ifdef __GUNC__
+void redislog(int level, const char *fmt, ...)
+    __attribute__((format(printf, 2, 3)));
+#else
+void redislog(int level, const char *fmt, ...);
+#endif
+
+void cacheLogRaw(int level, const char *msg);
+void cacheLogFromHandler(int level, const char *msg);
+void usage(void);
+void updateDictResizePolicy(void);
+int htNeedsResize(Dict *dict);
+void oom(const char *msg);
+void populateCommandTable(void);
+void resetCommandTableStats(void);
+void adjustOpenFilesLimit(void);
+void closeListeningSockets(int unlink_unix_socket);
+void updateCachedTime(void);
+void resetServerStats(void);
+unsigned int getLRUClock(void);
+
+cobj *setTypeCreate(cobj *value);
+int setTypeAdd(cobj *subject, cobj *value);
+int setTypeRemove(cobj *subject, cobj *value);
+int setTypeIsMember(cobj *subject, cobj *value);
+setTypeIterator *setTypeInitIterator(cobj *subject);
+void setTypeReleaseIterator(setTypeIterator *si);
+int setTypeNext(setTypeIterator *si, cobj **objele, int64_t *llele);
+int setTypeRandomElement(cobj *setobj, cobj **objele, int64_t *llele);
+unsigned long setTypeSize(cobj *subject);
+void setTypeConvert(cobj *subject, int enc);
+
 #endif
