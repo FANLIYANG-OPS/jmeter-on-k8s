@@ -31,4 +31,6 @@ add_executable(cache_1_0_0
         src/ziplist.c
         src/ziplist.h
         src/zmalloc.c
-        src/zmalloc.h)
+        src/zmalloc.h
+        src/rio.h
+        src/rdb.h)
