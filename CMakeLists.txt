@@ -12,6 +12,7 @@ add_executable(cache_1_0_0
         src/anet.h
         src/cache.h
         src/cacheassert.h
+        src/cluster.h
         src/config.h
         src/const.h
         src/dict.c
@@ -33,4 +34,4 @@ add_executable(cache_1_0_0
         src/zmalloc.c
         src/zmalloc.h
         src/rio.h
-        src/rdb.h)
+        src/rdb.h src/cache.c)
