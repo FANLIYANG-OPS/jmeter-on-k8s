@@ -34,4 +34,6 @@ add_executable(cache_1_0_0
         src/zmalloc.c
         src/zmalloc.h
         src/rio.h
+        src/slowlog.h
+        src/bio.h
         src/rdb.h src/cache.c)
