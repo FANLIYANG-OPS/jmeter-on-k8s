@@ -11,19 +11,19 @@
 typedef char *Sds;
 
 struct Sdshdr {
-  unsigned int len;
-  unsigned int free;
-  char buf[];
+    unsigned int len;
+    unsigned int free;
+    char buf[];
 };
 
 static inline size_t sdsLen(const Sds s) {
-  struct Sdshdr *sh = (Sdshdr *)SDS_TO_SDS_HDR(s);
-  return sh->len;
+    struct Sdshdr *sh = SDS_TO_SDS_HDR(s);
+    return sh->len;
 }
 
 static inline size_t sdsAvail(const Sds s) {
-  struct Sdshdr *sh = (Sdshdr *)SDS_TO_SDS_HDR(s);
-  return sh->free;
+    struct Sdshdr *sh = SDS_TO_SDS_HDR(s);
+    return sh->free;
 }
 
 Sds sdsNewLen(const void *init, size_t init_len);

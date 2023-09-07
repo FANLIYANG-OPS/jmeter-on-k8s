@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <float.h>
 #include <limits.h>
 #include <locale.h>
@@ -239,13 +240,137 @@ void cacheLogRaw(int level, const char *msg) {
 void cacheLog(int level, const char *fmt, ...) {
     va_list ap;
     char msg[CACHE_MAX_LOGMSG_LEN];
-    if ((level & 0xff) < server.verbosity)
-        return;
+    if ((level & 0xff) < server.verbosity) return;
     va_start(ap, fmt);
     vsnprintf(msg, sizeof(msg), fmt, ap);
     va_end(ap);
     cacheLogRaw(level, msg);
 }
+
+void cacheLogFromHandler(int level, const char *msg) {
+    int fd;
+    int log_to_stdout = server.logfile[0] == '\0';
+    char buf[64];
+    if ((level & 0xff) < server.verbosity || (log_to_stdout && server.daemonize))
+        return;
+    fd = log_to_stdout
+         ? STDOUT_FILENO
+         : open(server.logfile, O_APPEND | O_CREAT | O_WRONLY, 0644);
+    if (fd == -1) return;
+    ll2string(buf, sizeof(buf), getpid());
+    if (write(fd, buf, strlen(buf)) == -1) goto err;
+    if (write(fd, ":signal-handler (", 17) == -1) goto err;
+    ll2string(buf, sizeof(buf), time(NULL));
+    if (write(fd, buf, strlen(buf)) == -1) goto err;
+    if (write(fd, ") ", 2) == -1) goto err;
+    if (write(fd, msg, strlen(msg)) == -1) goto err;
+    if (write(fd, "\n", 1) == -1) goto err;
+    err:
+    if (!log_to_stdout) close(fd);
+}
+
+long long ustime(void) {
+    struct timeval tv;
+    long long ust;
+    gettimeofday(&tv, NULL);
+    ust = ((long long) tv.tv_sec) * 1000000;
+    ust += tv.tv_usec;
+    return ust;
+}
+
+long long mstime(void) { return ustime() / 1000; }
+
+void exitFromChild(int retcode) {
+#ifdef COVERAGE_TEST
+    exit(retcode);
+#else
+    _exit(retcode);
+#endif
+}
+
+void dictVanillaFree(void *private, void *val) {
+    DICT_NOTUSED(private);
+    zfree(val);
+}
+
+void dictListDestructor(void *private, void *val) {
+    DICT_NOTUSED(private);
+    listRelease((List *) val);
+}
+
+int dictSdsKeyCompare(void *private, const void *key1, const void *key2) {
+    int l1, l2;
+    DICT_NOTUSED(private);
+    l1 = (int) sdsLen((Sds) key1);
+    l2 = (int) sdsLen((Sds) key2);
+    if (l1 != l2) return 0;
+    return memcmp(key1, key2, l1) == 0;
+}
+
+int dictSdsKeyCaseCompare(void *private, const void *key1, const void *key2) {
+    DICT_NOTUSED(private);
+    return strcasecmp(key1, key2) == 0;
+}
+
+void dictCacheObjectDestructor(void *private, void *val) {
+    DICT_NOTUSED(private);
+    if (val == NULL) return;
+    decrRefCount(val);
+}
+
+void dictSdsDestructor(void *private, void *val) {
+    DICT_NOTUSED(private);
+    sdsFree(val);
+}
+
+int dictObjKeyCompare(void *private, const void *key1, const void *key2) {
+    const cobj *o1 = key1, *o2 = key2;
+    return dictSdsKeyCompare(private, o1->ptr, o2->ptr);
+}
+
+
+unsigned int dictObjHash(const void *key) {
+    const cobj *o = key;
+    return dictGenHashFunction(o->ptr, (int) sdsLen((Sds) o->ptr));
+}
+
+unsigned int dictSdsHash() {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
