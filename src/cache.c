@@ -514,6 +514,33 @@ void activeExpireCycle(int type) {
       slots = dictSlots(db->expires);
       now = mstime();
       if (num && slots > DICT_HT_INITIAL_SIZE && (num * 100 / slots < 1)) break;
-    }
+      expired = 0;
+      ttl_sum = 0;
+      ttl_samples = 0;
+      if (num > ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP)
+        num = ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP;
+      while (num--) {
+        DictEntry *de;
+        long long ttl;
+        if ((de = dictGetRandomKey(db->expires)) == NULL) break;
+        ttl = dictGetSignedIntegerVal(de) - now;
+        if (activeExpireCycleTryExpire(db, de, now)) expired++;
+        if (ttl < 0) ttl = 0;
+        ttl_sum += ttl;
+        ttl_samples++;
+      }
+      if (ttl_samples) {
+        long long avg_ttl = ttl_sum / ttl_samples;
+        if (db->avg_ttl == 0) db->avg_ttl = avg_ttl;
+        db->avg_ttl = (db->avg_ttl + avg_ttl) / 2;
+      }
+      iteration++;
+      if ((iteration & 0xf) == 0) {
+        long long elapsed = ustime() - start;
+        latencyAddSampleIfNeeded("expire-cycle", elapsed / 1000);
+        if (elapsed > time_limit) time_limit_exit = 1;
+      }
+      if (time_limit_exit) return;
+    } while (expired > ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP);
   }
 }
