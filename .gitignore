@@ -3,3 +3,5 @@ build
 .idea
 cmake-build-debug
 venv
+.cache
+compile_commands.json

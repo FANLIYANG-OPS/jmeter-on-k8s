@@ -25,6 +25,7 @@
 #include "bio.h"
 #include "cluster.h"
 #include "latency.h"
+#include "rdb.h"
 #include "slowlog.h"
 
 struct sharedObjectStruct shared;
@@ -158,10 +159,10 @@ struct cacheCommand cacheCommandTable[] = {
     {"ttl", ttlCommand, 2, "rF", 0, NULL, 1, 1, 1, 0, 0},
     {"pttl", pttlCommand, 2, "rF", 0, NULL, 1, 1, 1, 0, 0},
     {"persist", persistCommand, 2, "wF", 0, NULL, 1, 1, 1, 0, 0},
-    {"slaveof", slaveofCommand, 3, "ast", NULL, 0, 0, 0, 0, 0},
+    {"slaveof", slaveofCommand, 3, "ast", 0, NULL, 0, 0, 0, 0, 0},
     {"role", roleCommand, 1, "lst", 0, NULL, 0, 0, 0, 0, 0},
     {"debug", debugCommand, -2, "as", 0, NULL, 0, 0, 0, 0, 0},
-    {"config", configCommand, -2, "art", NULL, 0, 0, 0, 0, 0},
+    {"config", configCommand, -2, "art", 0, NULL, 0, 0, 0, 0, 0},
     {"subscribe", subscribeCommand, -2, "rpslt", 0, NULL, 0, 0, 0, 0, 0},
     {"unsubscribe", unsubscribeCommand, -1, "rpslt", 0, NULL, 0, 0, 0, 0, 0},
     {"psubscribe", psubscribeCommand, -2, "rpslt", 0, NULL, 0, 0, 0, 0, 0},
@@ -208,9 +209,11 @@ void cacheLogRaw(int level, const char *msg) {
   int rawmode = (level & CACHE_LOG_RAW);
   int log_to_stdout = server.logfile[0] == '\0';
   level &= 0xff;
-  if (level < server.verbosity) return;
+  if (level < server.verbosity)
+    return;
   fp = log_to_stdout ? stdout : fopen(server.logfile, "a");
-  if (!fp) return;
+  if (!fp)
+    return;
   if (rawmode) {
     fprintf(fp, "%s", msg);
   } else {
@@ -233,14 +236,17 @@ void cacheLogRaw(int level, const char *msg) {
             msg);
   }
   fflush(fp);
-  if (!log_to_stdout) fclose(fp);
-  if (server.syslog_enabled) syslog(syslogLevelMap[level], "%s", msg);
+  if (!log_to_stdout)
+    fclose(fp);
+  if (server.syslog_enabled)
+    syslog(syslogLevelMap[level], "%s", msg);
 }
 
 void cacheLog(int level, const char *fmt, ...) {
   va_list ap;
   char msg[CACHE_MAX_LOGMSG_LEN];
-  if ((level & 0xff) < server.verbosity) return;
+  if ((level & 0xff) < server.verbosity)
+    return;
   va_start(ap, fmt);
   vsnprintf(msg, sizeof(msg), fmt, ap);
   va_end(ap);
@@ -256,17 +262,25 @@ void cacheLogFromHandler(int level, const char *msg) {
   fd = log_to_stdout
            ? STDOUT_FILENO
            : open(server.logfile, O_APPEND | O_CREAT | O_WRONLY, 0644);
-  if (fd == -1) return;
+  if (fd == -1)
+    return;
   ll2string(buf, sizeof(buf), getpid());
-  if (write(fd, buf, strlen(buf)) == -1) goto err;
-  if (write(fd, ":signal-handler (", 17) == -1) goto err;
+  if (write(fd, buf, strlen(buf)) == -1)
+    goto err;
+  if (write(fd, ":signal-handler (", 17) == -1)
+    goto err;
   ll2string(buf, sizeof(buf), time(NULL));
-  if (write(fd, buf, strlen(buf)) == -1) goto err;
-  if (write(fd, ") ", 2) == -1) goto err;
-  if (write(fd, msg, strlen(msg)) == -1) goto err;
-  if (write(fd, "\n", 1) == -1) goto err;
+  if (write(fd, buf, strlen(buf)) == -1)
+    goto err;
+  if (write(fd, ") ", 2) == -1)
+    goto err;
+  if (write(fd, msg, strlen(msg)) == -1)
+    goto err;
+  if (write(fd, "\n", 1) == -1)
+    goto err;
 err:
-  if (!log_to_stdout) close(fd);
+  if (!log_to_stdout)
+    close(fd);
 }
 
 long long ustime(void) {
@@ -303,7 +317,8 @@ int dictSdsKeyCompare(void *private, const void *key1, const void *key2) {
   DICT_NOTUSED(private);
   l1 = (int)sdsLen((Sds)key1);
   l2 = (int)sdsLen((Sds)key2);
-  if (l1 != l2) return 0;
+  if (l1 != l2)
+    return 0;
   return memcmp(key1, key2, l1) == 0;
 }
 
@@ -314,7 +329,8 @@ int dictSdsKeyCaseCompare(void *private, const void *key1, const void *key2) {
 
 void dictCacheObjectDestructor(void *private, void *val) {
   DICT_NOTUSED(private);
-  if (val == NULL) return;
+  if (val == NULL)
+    return;
   decrRefCount(val);
 }
 
@@ -437,7 +453,8 @@ int htNeedsResize(Dict *dict) {
 }
 
 void tryResizeHashTables(int dbid) {
-  if (htNeedsResize(server.db[dbid].dict)) dictResize(server.db[dbid].dict);
+  if (htNeedsResize(server.db[dbid].dict))
+    dictResize(server.db[dbid].dict);
   if (htNeedsResize(server.db[dbid].expires))
     dictResize(server.db[dbid].expires);
 }
@@ -487,8 +504,10 @@ void activeExpireCycle(int type) {
   long long start = ustime(), time_limit;
 
   if (type == ACTIVE_EXPIRE_CYCLE_FAST) {
-    if (!time_limit_exit) return;
-    if (start < last_fast_cycle + ACTIVE_EXPIRE_CYCLE_FAST_DURATION * 2) return;
+    if (!time_limit_exit)
+      return;
+    if (start < last_fast_cycle + ACTIVE_EXPIRE_CYCLE_FAST_DURATION * 2)
+      return;
     last_fast_cycle = start;
   }
   if (dbs_per_call > server.dbnum || time_limit_exit)
@@ -496,7 +515,8 @@ void activeExpireCycle(int type) {
 
   time_limit = 1000000 * ACTIVE_EXPIRE_CYCLE_SLOW_TIME_PERC / server.hz / 100;
   time_limit_exit = 0;
-  if (time_limit <= 0) time_limit = 1;
+  if (time_limit <= 0)
+    time_limit = 1;
   if (type == ACTIVE_EXPIRE_CYCLE_FAST)
     time_limit = ACTIVE_EXPIRE_CYCLE_FAST_DURATION;
   for (j = 0; j < dbs_per_call; j++) {
@@ -513,7 +533,8 @@ void activeExpireCycle(int type) {
       }
       slots = dictSlots(db->expires);
       now = mstime();
-      if (num && slots > DICT_HT_INITIAL_SIZE && (num * 100 / slots < 1)) break;
+      if (num && slots > DICT_HT_INITIAL_SIZE && (num * 100 / slots < 1))
+        break;
       expired = 0;
       ttl_sum = 0;
       ttl_samples = 0;
@@ -522,25 +543,263 @@ void activeExpireCycle(int type) {
       while (num--) {
         DictEntry *de;
         long long ttl;
-        if ((de = dictGetRandomKey(db->expires)) == NULL) break;
+        if ((de = dictGetRandomKey(db->expires)) == NULL)
+          break;
         ttl = dictGetSignedIntegerVal(de) - now;
-        if (activeExpireCycleTryExpire(db, de, now)) expired++;
-        if (ttl < 0) ttl = 0;
+        if (activeExpireCycleTryExpire(db, de, now))
+          expired++;
+        if (ttl < 0)
+          ttl = 0;
         ttl_sum += ttl;
         ttl_samples++;
       }
       if (ttl_samples) {
         long long avg_ttl = ttl_sum / ttl_samples;
-        if (db->avg_ttl == 0) db->avg_ttl = avg_ttl;
+        if (db->avg_ttl == 0)
+          db->avg_ttl = avg_ttl;
         db->avg_ttl = (db->avg_ttl + avg_ttl) / 2;
       }
       iteration++;
       if ((iteration & 0xf) == 0) {
         long long elapsed = ustime() - start;
         latencyAddSampleIfNeeded("expire-cycle", elapsed / 1000);
-        if (elapsed > time_limit) time_limit_exit = 1;
+        if (elapsed > time_limit)
+          time_limit_exit = 1;
       }
-      if (time_limit_exit) return;
+      if (time_limit_exit)
+        return;
     } while (expired > ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP);
   }
+}
+
+unsigned int getLRUClock(void) {
+  return (mstime() / CACHE_LRU_CLOCK_RESOLUTION) & CACHE_LRU_CLOCK_MAX;
+}
+
+void trackInstantaneousMetric(int metric, long long current_reading) {
+  long long t = mstime() - server.inst_metric[metric].last_sample_time;
+  long long ops = current_reading =
+      server.inst_metric[metric].last_sample_count;
+  long long ops_sec;
+  ops_sec = t > 0 ? (ops * 1000 / t) : 0;
+  server.inst_metric[metric].samples[server.inst_metric[metric].idx] = ops_sec;
+  server.inst_metric[metric].idx++;
+  server.inst_metric[metric].idx %= CACHE_METRIC_SAMPLES;
+  server.inst_metric[metric].last_sample_time = mstime();
+  server.inst_metric[metric].last_sample_count = current_reading;
+}
+
+long long getInstantaneousMetric(int metric) {
+  int j;
+  long long sum = 0;
+  for (j = 0; j < CACHE_METRIC_SAMPLES; j++)
+    sum += server.inst_metric[metric].samples[j];
+  return sum / CACHE_METRIC_SAMPLES;
+}
+
+int clientsCronHandleTimeout(cacheClient *c) {
+  time_t now = server.unixtime;
+  if (server.maxidletime && !(c->flags & CACHE_SLAVE) &&
+      !(c->flags & CACHE_MASTER) && !(c->flags & CACHE_BLOCKED) &&
+      !(c->flags & CACHE_PUBSUB) &&
+      (now - c->lastinteraction > server.maxidletime)) {
+    cacheLog(CACHE_VERBOSE, "Closing idle client");
+    freeClient(c);
+    return 1;
+  } else if (c->flags & CACHE_BLOCKED) {
+    ms_time_t now_ms = mstime();
+    if (c->bpop.timeout != 0 && c->bpop.timeout < now_ms) {
+      replyToBlockedClientTimedOut(c);
+      unblockClient(c);
+    } else if (server.cluster_enabled) {
+      if (clusterRedirectBlockedClientIfNeeded(c)) {
+        unblockClient(c);
+      }
+    }
+  }
+  return 0;
+}
+
+int clientsCronResizeQueryBuffer(cacheClient *c) {
+  size_t query_buf_size = sdsAllocSize(c->querybuf);
+  time_t idletime = server.unixtime - c->lastinteraction;
+  if (((query_buf_size > CACHE_MBULK_BIG_ARG) &&
+       (query_buf_size / (c->querybuf_peak + 1)) > 2) ||
+      (query_buf_size > 1024 && idletime > 2)) {
+    if (sdsAvail(c->querybuf) > 1024) {
+      c->querybuf = sdsRemoveFreeSpace(c->querybuf);
+    }
+  }
+  c->querybuf_peak = 0;
+  return 0;
+}
+
+void clientsCron(void) {
+  int numclients = listLength(server.clients);
+  int iterations = numclients / (server.hz * 10);
+  if (iterations < 50)
+    iterations = (numclients < 50) ? numclients : 50;
+  while (listLength(server.clients) && iterations--) {
+    cacheClient *c;
+    ListNode *head;
+    listRotate(server.clients);
+    head = listFirst(server.clients);
+    c = listNodeValue(head);
+    if (clientsCronHandleTimeout(c))
+      continue;
+    if (clientsCronResizeQueryBuffer(c))
+      continue;
+  }
+}
+
+void databaseCron(void) {
+  if (server.active_expire_enabled && server.masterhost == NULL)
+    activeExpireCycle(ACTIVE_EXPIRE_CYCLE_SLOW);
+  if (server.rdb_chiled_pid == -1 && server.aof_child_pid == -1) {
+    static unsigned int resize_db = 0;
+    static unsigned int rehash_db = 0;
+    int dbs_per_call = CACHE_DBCRON_DBS_PER_CALL;
+    int j;
+    if (dbs_per_call > server.dbnum)
+      dbs_per_call = server.dbnum;
+    for (j = 0; j < dbs_per_call; j++) {
+      tryResizeHashTables(resize_db % server.dbnum);
+      resize_db++;
+    }
+    if (server.activerehashing) {
+      for (j = 0; j < dbs_per_call; j++) {
+        int work_done = incrmentallyRehash(rehash_db % server.dbnum);
+        rehash_db++;
+        if (work_done) {
+          break;
+        }
+      }
+    }
+  }
+}
+
+void updateCacheTime(void) {
+  server.unixtime = time(NULL);
+  server.mstime = mstime();
+}
+
+int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
+  int j;
+  CACHE_NOTUSED(eventLoop);
+  CACHE_NOTUSED(id);
+  CACHE_NOTUSED(clientData);
+  if (server.watchdog_period)
+    watchdogScheduleSignal(server.watchdog_period);
+  updateCacheTime();
+  run_with_period(100) {
+    trackInstantaneousMetric(CACHE_METRIC_COMMAND, server.stat_numcommands);
+    trackInstantaneousMetric(CACHE_METRIC_NET_INPUT,
+                             server.stat_net_input_bytes);
+    trackInstantaneousMetric(CACHE_METRIC_NET_OUTPUT,
+                             server.stat_net_output_bytes);
+  }
+  server.lruclock = getLRUClock();
+  if (zmalloc_used_memory() > server.stat_peak_memory)
+    server.stat_peak_memory = zmalloc_used_memory();
+  server.resident_set_size = zmalloc_get_rss();
+  if (server.shutdown_asap) {
+    if (prepareForShutdown() == CACHE_OK)
+      exit(0);
+    cacheLog(CACHE_WARNING, "SIGTERM received but errors trying to shut down "
+                            "the server , check the logs for more information");
+    server.shutdown_asap = 0;
+  }
+  run_with_period(5000) {
+    for (j = 0; j < server.dbnum; j++) {
+      long long size, used, vkeys;
+      size = dictSlots(server.db[j].dict);
+      used = dictSize(server.db[j].dict);
+      vkeys = dictSize(server.db[j].expires);
+      if (used || vkeys) {
+        cacheLog(CACHE_VERBOSE,
+                 "DB %d: %lld keys (%lld volatile) in %lld slots HT.", j, used,
+                 vkeys, size);
+      }
+    }
+  }
+  if (!server.sentinel_mode) {
+    run_with_period(5000) {
+      cacheLog(CACHE_VERBOSE,
+               "%lu clients connected (%lu slaves) , %zu bytes in use",
+               listLength(server.clients) - listLength(server.slaves),
+               listLength(server.slaves), zmalloc_used_memory());
+    }
+  }
+  clientsCron();
+  databaseCron();
+  if (server.rdb_chiled_pid == -1 && server.aof_child_pid == -1 &&
+      server.aof_rewrite_scheduled)
+    rewriteAppendOnlyFileBackground();
+  if (server.rdb_chiled_pid != -1 || server.aof_child_pid != -1) {
+    int statloc;
+    pid_t pid;
+    if ((pid == wait3(&statloc, WNOHANG, NULL)) != 0) {
+      int exitcode = WEXITSTATUS(statloc);
+      int bysignal = 0;
+      if (WIFSIGNALED(statloc))
+        bysignal = WTERMSIG(statloc);
+      if (pid == server.rdb_chiled_pid) {
+        backgroundSaveDoneHandler(exitcode, bysignal);
+      } else if (pid == server.aof_child_pid) {
+        backgroundRewriteDoneHandler(exitcode, bysignal);
+      } else {
+        cacheLog(CACHE_WARNING,
+                 "Warning , detected child with unmatched pod : %ld",
+                 (long)pid);
+      }
+      updateDictResizePolicy();
+    }
+  } else {
+    for (j = 0; j < server.saveparamslen; j++) {
+      struct saveparam *sp = server.saveparams++;
+      if (server.dirty >= sp->changes &&
+          server.unixtime - server.lastsave > sp->seconds &&
+          (server.unixtime - server.lastbgsave_try > CACHE_BGSAVE_RETRY_DELAY ||
+           server.lastbgsave_status == CACHE_OK)) {
+        cacheLog(CACHE_NOTICE, "%d changes in %d seconds . Saving ...",
+                 sp->changes, (int)sp->seconds);
+        rdbSaveBackground(server.rdb_filename);
+        break;
+      }
+    }
+    if (server.rdb_chiled_pid == -1 && server.aof_child_pid == -1 &&
+        server.aof_rewrite_perc &&
+        server.aof_current_size > server.aof_rewrite_min_size) {
+      long long base =
+          server.aof_rewrite_base_size ? server.aof_rewrite_base_size : 1;
+      long long growth = (server.aof_current_size * 100 / base) - 100;
+      if (growth >= server.aof_rewrite_perc) {
+        cacheLog(CACHE_NOTICE,
+                 "Starting automatic rewriting of AOF on %lld%% growth ",
+                 growth);
+        rewriteAppendOnlyFileBackground();
+      }
+    }
+  }
+
+  if (server.aof_flush_postponed_start)
+    flushAppendOnlyFile(0);
+  run_with_period(1000) {
+    if (server.aof_last_write_status == CACHE_ERR)
+      flushAppendOnlyFile(0);
+  }
+  freeClientsInAsyncFreeQueue();
+  clientsArePaused();
+  run_with_period(1000) replicationCron();
+  run_with_period(100) {
+    if (server.cluster_enabled)
+      clusterCron();
+  }
+  run_with_period(100) {
+    if (server.sentinel_mode)
+      sentinelTimer();
+  }
+  run_with_period(1000) { migrateCloseTimedoutSockets(); }
+  server.cronloops;
+  return 1000 / server.hz;
 }

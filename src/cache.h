@@ -166,7 +166,7 @@ typedef long long ms_time_t;
 #define CACHE_MASTER (1 << 1)
 #define CACHE_MONITOR (1 << 2)
 #define CACHE_MULTI (1 << 3)
-#define CAHCE_BLOCKED (1 << 4)
+#define CACHE_BLOCKED (1 << 4)
 #define CACHE_DIRTY_CAS (1 << 5)
 #define CACHE_CLOSE_AFTER_REPLY (1 << 6)
 #define CACHE_UNBLOCKED (1 << 7)
@@ -529,7 +529,7 @@ struct cacheServer {
   long long slowlog_entry_id;
   long long slowlog_log_slower_than;
   unsigned long slowlog_max_len;
-  size_t cacheident_set_size;
+  size_t resident_set_size;
   long long stat_net_input_bytes;
   long long stat_net_output_bytes;
   struct {
