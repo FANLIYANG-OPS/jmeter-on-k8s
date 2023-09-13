@@ -516,7 +516,7 @@ Sds sdsCatPrintf(Sds s, const char *fmt, ...) {
   va_list ap;
   char *t;
   va_start(ap, fmt);
-  t = sdsCatVPrintf(s, fmt, ap);
+  t = sdsCatVPrintf(s, fmt, ap, NULL);
   va_end(ap);
   return t;
 }

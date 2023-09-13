@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "const.h"
 #include "endianconv.h"
 #include "zmalloc.h"
 
