@@ -295,11 +295,11 @@ typedef long long ms_time_t;
 #define CACHE_LRU_CLOCK_MAX ((1 << CACHE_LRU_BITS) - 1)
 #define CACHE_LRU_CLOCK_RESOLUTION 1000
 typedef struct cacheObject {
-    unsigned type: 4;
-    unsigned encoding: 4;
-    unsigned lru: CACHE_LRU_BITS;
-    int refcount;
-    void *ptr;
+  unsigned type : 4;
+  unsigned encoding : 4;
+  unsigned lru : CACHE_LRU_BITS;
+  int refcount;
+  void *ptr;
 } cobj;
 
 #define LRU_CLOCK()                                                   \
@@ -316,150 +316,150 @@ typedef struct cacheObject {
 
 #define CACHE_EVICTION_POOL_SIZE 16
 struct evictionPoolEntry {
-    unsigned long long idle;
-    Sds *key;
+  unsigned long long idle;
+  Sds *key;
 };
 
 typedef struct cacheDB {
-    Dict *dict;
-    Dict *expires;
-    Dict *blocking_keys;
-    Dict *ready_keys;
-    Dict *watched_keys;
-    int id;
-    long long avg_ttl;
-    struct evictionPoolEntry *eviction_pool;
+  Dict *dict;
+  Dict *expires;
+  Dict *blocking_keys;
+  Dict *ready_keys;
+  Dict *watched_keys;
+  int id;
+  long long avg_ttl;
+  struct evictionPoolEntry *eviction_pool;
 } cacheDB;
 
 typedef struct multiCmd {
-    cobj **argv;
-    int argc;
-    struct cacheCommand *cmd;
+  cobj **argv;
+  int argc;
+  struct cacheCommand *cmd;
 } multiCmd;
 
 typedef struct multiState {
-    multiCmd *commands;
-    int count;
-    int minreplicas;
-    time_t minreplicas_timeout;
+  multiCmd *commands;
+  int count;
+  int minreplicas;
+  time_t minreplicas_timeout;
 } multiState;
 
 typedef struct blockingState {
-    ms_time_t timeout;
-    Dict *keys;
-    cobj *target;
-    int numreplicas;
-    long long reploffset;
+  ms_time_t timeout;
+  Dict *keys;
+  cobj *target;
+  int numreplicas;
+  long long reploffset;
 } blockingState;
 
 typedef struct readyList {
-    cacheDB *db;
-    cobj *key;
+  cacheDB *db;
+  cobj *key;
 } readyList;
 
 typedef struct cacheClient {
-    uint64_t id;
-    int fd;
-    cacheDB *db;
-    int dictid;
-    cobj *name;
-    Sds querybuf;
-    size_t querybuf_peak;
-    int argc;
-    cobj **argv;
-    struct cacheCommand *cmd, *lastcmd;
-    int reqtype;
-    int multibulklen;
-    long bulklen;
-    List *reply;
-    unsigned long reply_bytes;
-    int sentlen;
-    time_t ctime;
-    time_t lastinteraction;
-    time_t obuf_soft_limit_reached_time;
-    int flags;
-    int authenticated;
-    int replstate;
-    int repl_put_online_on_ack;
-    int repldbfd;
-    off_t repldboff;
-    off_t repldbsize;
-    Sds replpreamble;
-    long long reploff;
-    long long repl_ack_off;
-    long long repl_ack_time;
-    char replrunid[CACHE_RUN_ID_SIZE + 1];
-    int slave_listening_port;
-    multiState mstate;
-    int btype;
-    blockingState bpop;
-    long long woff;
-    List *watched_keys;
-    Dict *pubsub_channels;
-    List *pubsub_patterns;
-    Sds peerid;
-    int bufpos;
-    char buf[CACHE_REPLY_CHUNK_BYTES];
+  uint64_t id;
+  int fd;
+  cacheDB *db;
+  int dictid;
+  cobj *name;
+  Sds querybuf;
+  size_t querybuf_peak;
+  int argc;
+  cobj **argv;
+  struct cacheCommand *cmd, *lastcmd;
+  int reqtype;
+  int multibulklen;
+  long bulklen;
+  List *reply;
+  unsigned long reply_bytes;
+  int sentlen;
+  time_t ctime;
+  time_t lastinteraction;
+  time_t obuf_soft_limit_reached_time;
+  int flags;
+  int authenticated;
+  int replstate;
+  int repl_put_online_on_ack;
+  int repldbfd;
+  off_t repldboff;
+  off_t repldbsize;
+  Sds replpreamble;
+  long long reploff;
+  long long repl_ack_off;
+  long long repl_ack_time;
+  char replrunid[CACHE_RUN_ID_SIZE + 1];
+  int slave_listening_port;
+  multiState mstate;
+  int btype;
+  blockingState bpop;
+  long long woff;
+  List *watched_keys;
+  Dict *pubsub_channels;
+  List *pubsub_patterns;
+  Sds peerid;
+  int bufpos;
+  char buf[CACHE_REPLY_CHUNK_BYTES];
 } cacheClient;
 
 struct saveparam {
-    time_t seconds;
-    int changes;
+  time_t seconds;
+  int changes;
 };
 
 struct sharedObjectStruct {
-    cobj *crlf, *ok, *err, *emptybulk, *czero, *cone, *cnegone, *pong, *space,
-            *colon, *nullbulk, *nullmultibulk, *queued, *emptymultibulk,
-            *wrongtypeerr, *nokeyerr, *syntaxerr, *sameobjecterr, *outofrangeerr,
-            *noscripterr, *loadingerr, *slowscripterr, *bgsaveerr, *masterdownerr,
-            *roslaveerr, *execaborterr, *noautherr, *noreplicaserr, *busykeyerr,
-            *oomerr, *plus, *messagebulk, *pmessagebulk, *subscribebulk,
-            *unsubscribebulk, *psubscribebulk, *punsubscribebulk, *del, *rpop, *lpop,
-            *lpush, *emptyscan, *minstring, *maxstring,
-            *select[CACHE_SHARED_SELECT_CMDS], *integers[CACHE_SHARED_INTEGERS],
-            *mbulkhdr[CACHE_SHARED_BULKHDR_LEN], *bulkhdr[CACHE_SHARED_BULKHDR_LEN];
+  cobj *crlf, *ok, *err, *emptybulk, *czero, *cone, *cnegone, *pong, *space,
+      *colon, *nullbulk, *nullmultibulk, *queued, *emptymultibulk,
+      *wrongtypeerr, *nokeyerr, *syntaxerr, *sameobjecterr, *outofrangeerr,
+      *noscripterr, *loadingerr, *slowscripterr, *bgsaveerr, *masterdownerr,
+      *roslaveerr, *execaborterr, *noautherr, *noreplicaserr, *busykeyerr,
+      *oomerr, *plus, *messagebulk, *pmessagebulk, *subscribebulk,
+      *unsubscribebulk, *psubscribebulk, *punsubscribebulk, *del, *rpop, *lpop,
+      *lpush, *emptyscan, *minstring, *maxstring,
+      *select[CACHE_SHARED_SELECT_CMDS], *integers[CACHE_SHARED_INTEGERS],
+      *mbulkhdr[CACHE_SHARED_BULKHDR_LEN], *bulkhdr[CACHE_SHARED_BULKHDR_LEN];
 };
 
 typedef struct zskiplistNode {
-    cobj *obj;
-    double score;
-    struct zskiplistNode *backward;
-    struct zskiplistLevel {
-        struct zskiplistNode *forward;
-        unsigned int span;
-    } level[];
+  cobj *obj;
+  double score;
+  struct zskiplistNode *backward;
+  struct zskiplistLevel {
+    struct zskiplistNode *forward;
+    unsigned int span;
+  } level[];
 
 } zskiplistNode;
 
 typedef struct zskiplist {
-    struct zskiplistNode *header, *tail;
-    unsigned long length;
-    int level;
+  struct zskiplistNode *header, *tail;
+  unsigned long length;
+  int level;
 } zskiplist;
 
 typedef struct zset {
-    Dict *dict;
-    zskiplist *zsl;
+  Dict *dict;
+  zskiplist *zsl;
 } zset;
 
 typedef struct clientBufferLimitsConfig {
-    unsigned long long hard_limit_bytes;
-    unsigned long long soft_limit_bytes;
-    time_t soft_limit_seconds;
+  unsigned long long hard_limit_bytes;
+  unsigned long long soft_limit_bytes;
+  time_t soft_limit_seconds;
 } clientBufferLimitsConfig;
 
 extern clientBufferLimitsConfig
-        clientBufferLimitsDefaults[CACHE_CLIENT_TYPE_COUNT];
+    clientBufferLimitsDefaults[CACHE_CLIENT_TYPE_COUNT];
 
 typedef struct cacheOP {
-    cobj **argv;
-    int argc, db_id, target;
-    struct cacheCommand *cmd;
+  cobj **argv;
+  int argc, db_id, target;
+  struct cacheCommand *cmd;
 } cacheOP;
 
 typedef struct cacheOPArray {
-    cacheOP *ops;
-    int num_ops;
+  cacheOP *ops;
+  int num_ops;
 } cacheOPArray;
 
 struct clusterState;
@@ -468,234 +468,234 @@ struct clusterState;
 #endif
 
 struct cacheServer {
-    pid_t pid;
-    char *configfile;
-    int hz;
-    cacheDB *db;
-    Dict *commands;
-    Dict *orig_commands;
-    aeEventLoop *el;
-    unsigned lruclock: CACHE_LRU_BITS;
-    int shutdown_asap;
-    int activerehashing;
-    char *requirepass;
-    char *pidfile;
-    int arch_bits;
-    int cronloops;
-    char runid[CACHE_RUN_ID_SIZE + 1];
-    int sentinel_mode;
-    int port;
-    int tcp_backlog;
-    char *bindaddr[CACHE_BINDADDR_MAX];
-    int bindaddr_count;
-    char *unixsocket;
-    mode_t unixsocketperm;
-    int ipfd[CACHE_BINDADDR_MAX];
-    int ipfd_count;
-    int sofd;
-    int cfd[CACHE_BINDADDR_MAX];
-    int cfd_count;
-    List *clients;
-    List *client_to_close;
-    List *slaves, *monitors;
-    cacheClient *current_client;
-    int clients_paused;
-    ms_time_t clients_pause_end_time;
-    char neterr[ANET_ERR_LEN];
-    Dict *migrate_cached_sockets;
-    uint64_t next_client_id;
-    int loading;
-    off_t loading_total_bytes;
-    off_t loading_loaded_bytes;
-    time_t loading_start_time;
-    off_t loading_process_events_interval_bytes;
-    struct cacheCommand *delCommand, *multiCommand, *lpushCommand, *lpopCommand,
-            *rpopCommand;
-    time_t stat_starttime;
-    long long stat_numcommands;
-    long long stat_numconnections;
-    long long stat_expiredkeys;
-    long long stat_evictedkeys;
-    long long stat_keyspace_hits;
-    long long stat_keyspace_misses;
-    size_t stat_peak_memory;
-    long long stat_fork_time;
-    double start_fork_rate;
-    long long start_rejected_connections;
-    long long stat_sync_full;
-    long long stat_sync_partial_ok;
-    long long stat_sync_partial_err;
-    List *slowlog;
-    long long slowlog_entry_id;
-    long long slowlog_log_slower_than;
-    unsigned long slowlog_max_len;
-    size_t resident_set_size;
-    long long stat_net_input_bytes;
-    long long stat_net_output_bytes;
-    struct {
-        long long last_sample_time;
-        long long last_sample_count;
-        long long samples[CACHE_METRIC_SAMPLES];
-        int idx;
-    } inst_metric[CACHE_METRIC_COUNT];
-    int verbosity;
-    int maxidletime;
-    int tcpkeepalive;
-    int active_expire_enabled;
-    size_t client_max_querybuf_len;
-    int dbnum;
-    int daemonize;
-    clientBufferLimitsConfig client_obuf_limits[CACHE_CLIENT_TYPE_COUNT];
-    int aof_state;
-    int aof_fsync;
-    char *aof_filename;
-    int aof_no_fsync_on_rewrite;
-    int aof_rewrite_perc;
-    off_t aof_rewrite_min_size;
-    off_t aof_rewrite_base_size;
-    off_t aof_current_size;
-    int aof_rewrite_scheduled;
-    pid_t aof_child_pid;
-    List *aof_rewrite_buf_blocks;
-    Sds aof_buf;
-    int aof_fd;
-    int aof_selected_db;
-    time_t aof_flush_postponed_start;
-    int aof_last_fsync;
-    time_t aof_rewrite_time_last;
-    time_t aof_rewrite_time_start;
-    int aof_lastbgrewrite_status;
-    unsigned long aof_delayed_fsync;
-    int aof_rewrite_incremental_fsync;
-    int aof_last_write_status;
-    int aof_last_write_errno;
-    int aof_load_truncated;
-    int aof_pipe_write_data_to_child;
-    int aof_pipe_read_data_from_parent;
-    int aof_pipe_write_ack_to_parent;
-    int aof_pipe_write_ack_to_child;
-    int aof_pipe_read_ack_from_child;
-    int aof_pipe_read_ack_from_parent;
-    int aof_stop_sending_diff;
-    Sds aof_child_diff;
-    long long dirty;
-    long long dirty_before_bgsave;
-    pid_t rdb_chiled_pid;
-    struct saveparam *saveparams;
-    int saveparamslen;
-    char *rdb_filename;
-    int rdb_compression;
-    int rdb_checksum;
-    time_t lastsave;
-    time_t lastbgsave_try;
-    time_t rdb_save_time_last;
-    time_t rdb_save_time_start;
-    int rdb_child_type;
-    int lastbgsave_status;
-    int stop_writes_on_bgsave_err;
-    int rdb_pipe_write_result_to_parent;
-    int rdb_pipe_read_result_from_child;
-    cacheOPArray also_propagate;
-    char *logfile;
-    int syslog_enabled;
-    char *syslog_ident;
-    int syslog_facility;
-    int slaveseldb;
-    long long master_repl_offset;
-    int repl_ping_slave_period;
-    char *repl_backlog;
-    long long repl_backlog_size;
-    long long repl_backlog_histlen;
-    long long repl_backlog_idx;
-    long long repl_backlog_off;
-    time_t repl_backlog_time_limit;
-    time_t repl_no_slaves_since;
-    int repl_min_slaves_to_write;
-    int repl_min_slaves_max_lag;
-    int repl_good_slaves_count;
-    int repl_diskless_sync;
-    int repl_diskless_sync_delay;
-    char *masterauth;
-    char *masterhost;
-    int masterport;
-    int repl_timeout;
-    cacheClient *master;
-    cacheClient *cached_master;
-    int repl_syncio_timeout;
-    int repl_state;
-    off_t repl_transfer_size;
-    off_t repl_transfer_read;
-    off_t repl_transfer_last_fsync_off;
-    int repl_transfer_s;
-    char *repl_transfer_fd;
-    char *repl_transfer_tmpfile;
-    time_t repl_transfer_lastio;
-    int repl_serve_stale_data;
-    int repl_slave_ro;
-    time_t repl_down_since;
-    int repl_disable_tcp_nodelay;
-    int slave_priority;
-    char repl_master_runid[CACHE_RUN_ID_SIZE + 1];
-    long long repl_master_initial_offset;
-    Dict *repl_scriptcache_dict;
-    List *repl_scriptcache_fifo;
-    unsigned int repl_scriptcache_size;
-    List *clients_waiting_acks;
-    int get_ack_from_slaves;
-    unsigned int maxclients;
-    unsigned long long maxmemory;
-    int maxmemory_policy;
-    int maxmemory_samples;
-    unsigned int bpop_blocked_clients;
-    List *unblocked_clients;
-    List *ready_keys;
-    int sort_desc;
-    int sort_alpha;
-    int sort_bypattern;
-    int sort_store;
+  pid_t pid;
+  char *configfile;
+  int hz;
+  cacheDB *db;
+  Dict *commands;
+  Dict *orig_commands;
+  aeEventLoop *el;
+  unsigned lruclock : CACHE_LRU_BITS;
+  int shutdown_asap;
+  int activerehashing;
+  char *requirepass;
+  char *pidfile;
+  int arch_bits;
+  int cronloops;
+  char runid[CACHE_RUN_ID_SIZE + 1];
+  int sentinel_mode;
+  int port;
+  int tcp_backlog;
+  char *bindaddr[CACHE_BINDADDR_MAX];
+  int bindaddr_count;
+  char *unixsocket;
+  mode_t unixsocketperm;
+  int ipfd[CACHE_BINDADDR_MAX];
+  int ipfd_count;
+  int sofd;
+  int cfd[CACHE_BINDADDR_MAX];
+  int cfd_count;
+  List *clients;
+  List *client_to_close;
+  List *slaves, *monitors;
+  cacheClient *current_client;
+  int clients_paused;
+  ms_time_t clients_pause_end_time;
+  char neterr[ANET_ERR_LEN];
+  Dict *migrate_cached_sockets;
+  uint64_t next_client_id;
+  int loading;
+  off_t loading_total_bytes;
+  off_t loading_loaded_bytes;
+  time_t loading_start_time;
+  off_t loading_process_events_interval_bytes;
+  struct cacheCommand *delCommand, *multiCommand, *lpushCommand, *lpopCommand,
+      *rpopCommand;
+  time_t stat_starttime;
+  long long stat_numcommands;
+  long long stat_numconnections;
+  long long stat_expiredkeys;
+  long long stat_evictedkeys;
+  long long stat_keyspace_hits;
+  long long stat_keyspace_misses;
+  size_t stat_peak_memory;
+  long long stat_fork_time;
+  double start_fork_rate;
+  long long start_rejected_connections;
+  long long stat_sync_full;
+  long long stat_sync_partial_ok;
+  long long stat_sync_partial_err;
+  List *slowlog;
+  long long slowlog_entry_id;
+  long long slowlog_log_slower_than;
+  unsigned long slowlog_max_len;
+  size_t resident_set_size;
+  long long stat_net_input_bytes;
+  long long stat_net_output_bytes;
+  struct {
+    long long last_sample_time;
+    long long last_sample_count;
+    long long samples[CACHE_METRIC_SAMPLES];
+    int idx;
+  } inst_metric[CACHE_METRIC_COUNT];
+  int verbosity;
+  int maxidletime;
+  int tcpkeepalive;
+  int active_expire_enabled;
+  size_t client_max_querybuf_len;
+  int dbnum;
+  int daemonize;
+  clientBufferLimitsConfig client_obuf_limits[CACHE_CLIENT_TYPE_COUNT];
+  int aof_state;
+  int aof_fsync;
+  char *aof_filename;
+  int aof_no_fsync_on_rewrite;
+  int aof_rewrite_perc;
+  off_t aof_rewrite_min_size;
+  off_t aof_rewrite_base_size;
+  off_t aof_current_size;
+  int aof_rewrite_scheduled;
+  pid_t aof_child_pid;
+  List *aof_rewrite_buf_blocks;
+  Sds aof_buf;
+  int aof_fd;
+  int aof_selected_db;
+  time_t aof_flush_postponed_start;
+  int aof_last_fsync;
+  time_t aof_rewrite_time_last;
+  time_t aof_rewrite_time_start;
+  int aof_lastbgrewrite_status;
+  unsigned long aof_delayed_fsync;
+  int aof_rewrite_incremental_fsync;
+  int aof_last_write_status;
+  int aof_last_write_errno;
+  int aof_load_truncated;
+  int aof_pipe_write_data_to_child;
+  int aof_pipe_read_data_from_parent;
+  int aof_pipe_write_ack_to_parent;
+  int aof_pipe_write_ack_to_child;
+  int aof_pipe_read_ack_from_child;
+  int aof_pipe_read_ack_from_parent;
+  int aof_stop_sending_diff;
+  Sds aof_child_diff;
+  long long dirty;
+  long long dirty_before_bgsave;
+  pid_t rdb_chiled_pid;
+  struct saveparam *saveparams;
+  int saveparamslen;
+  char *rdb_filename;
+  int rdb_compression;
+  int rdb_checksum;
+  time_t lastsave;
+  time_t lastbgsave_try;
+  time_t rdb_save_time_last;
+  time_t rdb_save_time_start;
+  int rdb_child_type;
+  int lastbgsave_status;
+  int stop_writes_on_bgsave_err;
+  int rdb_pipe_write_result_to_parent;
+  int rdb_pipe_read_result_from_child;
+  cacheOPArray also_propagate;
+  char *logfile;
+  int syslog_enabled;
+  char *syslog_ident;
+  int syslog_facility;
+  int slaveseldb;
+  long long master_repl_offset;
+  int repl_ping_slave_period;
+  char *repl_backlog;
+  long long repl_backlog_size;
+  long long repl_backlog_histlen;
+  long long repl_backlog_idx;
+  long long repl_backlog_off;
+  time_t repl_backlog_time_limit;
+  time_t repl_no_slaves_since;
+  int repl_min_slaves_to_write;
+  int repl_min_slaves_max_lag;
+  int repl_good_slaves_count;
+  int repl_diskless_sync;
+  int repl_diskless_sync_delay;
+  char *masterauth;
+  char *masterhost;
+  int masterport;
+  int repl_timeout;
+  cacheClient *master;
+  cacheClient *cached_master;
+  int repl_syncio_timeout;
+  int repl_state;
+  off_t repl_transfer_size;
+  off_t repl_transfer_read;
+  off_t repl_transfer_last_fsync_off;
+  int repl_transfer_s;
+  char *repl_transfer_fd;
+  char *repl_transfer_tmpfile;
+  time_t repl_transfer_lastio;
+  int repl_serve_stale_data;
+  int repl_slave_ro;
+  time_t repl_down_since;
+  int repl_disable_tcp_nodelay;
+  int slave_priority;
+  char repl_master_runid[CACHE_RUN_ID_SIZE + 1];
+  long long repl_master_initial_offset;
+  Dict *repl_scriptcache_dict;
+  List *repl_scriptcache_fifo;
+  unsigned int repl_scriptcache_size;
+  List *clients_waiting_acks;
+  int get_ack_from_slaves;
+  unsigned int maxclients;
+  unsigned long long maxmemory;
+  int maxmemory_policy;
+  int maxmemory_samples;
+  unsigned int bpop_blocked_clients;
+  List *unblocked_clients;
+  List *ready_keys;
+  int sort_desc;
+  int sort_alpha;
+  int sort_bypattern;
+  int sort_store;
 
-    size_t hash_max_ziplist_entries;
-    size_t hash_max_ziplist_value;
-    size_t list_max_ziplist_entries;
-    size_t list_max_ziplist_value;
-    size_t set_max_intset_entries;
-    size_t zset_max_ziplist_entries;
-    size_t zset_max_ziplist_value;
-    size_t hll_sparse_max_bytes;
-    time_t unixtime;
-    long long mstime;
-    Dict *pubsub_channels;
-    List *pubsub_patterns;
-    int notify_keyspace_events;
-    int cluster_enabled;
-    ms_time_t cluster_node_timeout;
-    char *cluster_configfile;
-    struct clusterState *cluster;
-    int cluster_migration_barrier;
-    int cluster_slave_validity_factor;
-    int cluster_require_full_coverage;
-    lua_State *lua;
-    cacheClient *lua_client;
-    cacheClient *lua_caller;
-    Dict *lua_scripts;
-    ms_time_t lua_time_limit;
-    ms_time_t lua_time_start;
-    int lua_write_dirty;
-    int lua_random_dirty;
-    int lua_timeout;
-    int lua_kill;
-    long long latency_monitor_threshold;
-    Dict *latency_events;
-    char *assert_failed;
-    char *assert_file;
-    int assert_line;
-    int bug_report_start;
-    int watchdog_period;
+  size_t hash_max_ziplist_entries;
+  size_t hash_max_ziplist_value;
+  size_t list_max_ziplist_entries;
+  size_t list_max_ziplist_value;
+  size_t set_max_intset_entries;
+  size_t zset_max_ziplist_entries;
+  size_t zset_max_ziplist_value;
+  size_t hll_sparse_max_bytes;
+  time_t unixtime;
+  long long mstime;
+  Dict *pubsub_channels;
+  List *pubsub_patterns;
+  int notify_keyspace_events;
+  int cluster_enabled;
+  ms_time_t cluster_node_timeout;
+  char *cluster_configfile;
+  struct clusterState *cluster;
+  int cluster_migration_barrier;
+  int cluster_slave_validity_factor;
+  int cluster_require_full_coverage;
+  lua_State *lua;
+  cacheClient *lua_client;
+  cacheClient *lua_caller;
+  Dict *lua_scripts;
+  ms_time_t lua_time_limit;
+  ms_time_t lua_time_start;
+  int lua_write_dirty;
+  int lua_random_dirty;
+  int lua_timeout;
+  int lua_kill;
+  long long latency_monitor_threshold;
+  Dict *latency_events;
+  char *assert_failed;
+  char *assert_file;
+  int assert_line;
+  int bug_report_start;
+  int watchdog_period;
 };
 
 typedef struct pubsubPattern {
-    cacheClient *client;
-    cobj *pattern;
+  cacheClient *client;
+  cobj *pattern;
 } pubsubPattern;
 
 typedef void cacheCommandProc(cacheClient *c);
@@ -704,63 +704,63 @@ typedef int *cacheGetKeysProc(struct cacheCommand *cmd, cobj **argv, int argc,
                               int *num_keys);
 
 struct cacheCommand {
-    char *name;
-    cacheCommandProc *proc;
-    int arity;
-    char *sflags;
-    int flags;
-    cacheGetKeysProc *getkeys_proc;
-    int firstkey;
-    int lastkey;
-    int keystep;
-    long long microseconds, calls;
+  char *name;
+  cacheCommandProc *proc;
+  int arity;
+  char *sflags;
+  int flags;
+  cacheGetKeysProc *getkeys_proc;
+  int firstkey;
+  int lastkey;
+  int keystep;
+  long long microseconds, calls;
 };
 
 struct cacheFunctionSym {
-    char *name;
-    unsigned long pointer;
+  char *name;
+  unsigned long pointer;
 };
 
 typedef struct _cacheSortObject {
-    cobj *obj;
-    union {
-        double score;
-        cobj *cmp_obj;
-    } u;
+  cobj *obj;
+  union {
+    double score;
+    cobj *cmp_obj;
+  } u;
 } cacheSortObject;
 
 typedef struct _redisSortOperation {
-    int type;
-    cobj *pattern;
+  int type;
+  cobj *pattern;
 } redisSortOperation;
 
 typedef struct {
-    cobj *subject;
-    unsigned char encoding;
-    unsigned char direction;
-    unsigned char *zi;
-    ListNode *ln;
+  cobj *subject;
+  unsigned char encoding;
+  unsigned char direction;
+  unsigned char *zi;
+  ListNode *ln;
 } listTypeIterator;
 
 typedef struct {
-    listTypeIterator *li;
-    unsigned char *zi;
-    ListNode *ln;
+  listTypeIterator *li;
+  unsigned char *zi;
+  ListNode *ln;
 } listTypeEntry;
 
 typedef struct {
-    cobj *subject;
-    int encoding;
-    int ii;
-    DictIterator *di;
+  cobj *subject;
+  int encoding;
+  int ii;
+  DictIterator *di;
 } setTypeIterator;
 
 typedef struct {
-    cobj *subject;
-    int encoding;
-    unsigned char *fptr, *vptr;
-    DictIterator *di;
-    DictEntry *de;
+  cobj *subject;
+  int encoding;
+  unsigned char *fptr, *vptr;
+  DictIterator *di;
+  DictEntry *de;
 } hashTypeIterator;
 
 #define CACHE_HASH_KEY 1
@@ -1108,13 +1108,13 @@ void aofRewriteBufferReset(void);
 unsigned long aofRewriteBufferSize(void);
 
 typedef struct {
-    double min, max;
-    int minex, maxex;
+  double min, max;
+  int minex, maxex;
 } zrangespec;
 
 typedef struct {
-    cobj *min, *max;
-    int minex, maxex;
+  cobj *min, *max;
+  int minex, maxex;
 } zlexrangespec;
 
 zskiplist *zslCreate(void);
