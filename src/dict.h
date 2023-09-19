@@ -2,52 +2,58 @@
 #define DICT_H
 
 #include <stdint.h>
+
 #define DICT_OK 0
 #define DCIT_ERR 1
 
 #define DICT_NOTUSED(V) ((void)V)
 
 typedef struct DictEntry {
-  void *key;
-  union {
-    void *val;
-    uint64_t u64;
-    int64_t s64;
-    double d;
-  } v;
-  struct DictEntry *next;
+    void *key;
+    union {
+        void *val;
+        uint64_t u64;
+        int64_t s64;
+        double d;
+    } v;
+    struct DictEntry *next;
 } DictEntry;
 
 typedef struct DictType {
-  unsigned int (*hashFunction)(const void *key);
-  void *(*keyDup)(void *privdata, const void *key);
-  void *(*valDup)(void *privdata, const void *obj);
-  int (*keyCompare)(void *privdata, const void *key1, const void *key2);
-  void (*keyDestructor)(void *privdata, void *key);
-  void (*valDestructor)(void *privdata, void *obj);
+    unsigned int (*hashFunction)(const void *key);
+
+    void *(*keyDup)(void *privdata, const void *key);
+
+    void *(*valDup)(void *privdata, const void *obj);
+
+    int (*keyCompare)(void *privdata, const void *key1, const void *key2);
+
+    void (*keyDestructor)(void *privdata, void *key);
+
+    void (*valDestructor)(void *privdata, void *obj);
 } DictType;
 
 typedef struct DictHT {
-  DictEntry **table;
-  unsigned long size;
-  unsigned long size_mask;
-  unsigned long used;
+    DictEntry **table;
+    unsigned long size;
+    unsigned long size_mask;
+    unsigned long used;
 } DictHT;
 
 typedef struct Dict {
-  DictType *type;
-  void *privdata;
-  DictHT ht[2];
-  long rehashidx;
-  int iterators;
+    DictType *type;
+    void *privdata;
+    DictHT ht[2];
+    long rehashidx;
+    int iterators;
 } Dict;
 
 typedef struct DictIterator {
-  Dict *d;
-  long index;
-  int table, safe;
-  DictEntry *entry, *nextEntry;
-  long long fingerPrint;
+    Dict *d;
+    long index;
+    int table, safe;
+    DictEntry *entry, *nextEntry;
+    long long fingerPrint;
 } DictIterator;
 
 typedef void(dictScanFunction)(void *privdata, const DictEntry *de);
@@ -116,34 +122,63 @@ extern DictType dictTypeHeapStrings;
 extern DictType dictTypeHeapStringCopyKeyValue;
 
 Dict *dictCreate(DictType *type, void *privDataPtr);
+
 int dictExpand(Dict *d, unsigned long size);
+
 int dictAdd(Dict *d, void *key, void *val);
+
 DictEntry *dictAddRaw(Dict *d, void *key);
+
 int dictReplace(Dict *d, void *key, void *val);
+
 DictEntry *dictReplaceRaw(Dict *d, void *key);
+
 int dictDelete(Dict *d, const void *key);
+
 int dictDeleteNoFree(Dict *d, const void *key);
+
 void dictRelease(Dict *d);
+
 DictEntry *dictFind(Dict *d, const void *key);
+
 void *dictFetchValue(Dict *d, const void *key);
+
 int dictResize(Dict *d);
+
 DictIterator *dictGetIterator(Dict *d);
+
 DictIterator *dictGetSafeIterator(Dict *d);
+
 void dictReleaseIterator(DictIterator *iter);
+
 DictEntry *dictNext(DictIterator *iter);
+
 DictEntry *dictGetRandomKey(Dict *d);
+
 unsigned int dictGetSomeKeys(Dict *d, DictEntry **des, unsigned int count);
+
 void dictPrintStats(Dict *d);
+
 unsigned int dictGenHashFunction(const void *key, int len);
+
 unsigned int dictGenCaseHashFunction(const unsigned char *buf, int len);
+
 void dictEmpty(Dict *d, void(callback)(void *));
+
 void dictEnableResize(void);
+
 void dictDisableResize(void);
+
 int dictRehash(Dict *d, int n);
+
 long long timeInMilliseconds();
+
 int dictRehashMilliseconds(Dict *d, int ms);
+
 void dictSetHashFunctionSeed(uint32_t init_val);
+
 unsigned int dictGetHashFunctionSeed(void);
+
 unsigned long dictScan(Dict *d, unsigned long v, dictScanFunction *fn,
                        void *priv_data);
 

@@ -2,27 +2,27 @@
 #define __ADLIST_H__
 
 typedef struct ListNode {
-  struct ListNode *prev;
-  struct ListNode *next;
-  void *value;
+    struct ListNode *prev;
+    struct ListNode *next;
+    void *value;
 } ListNode;
 
 typedef struct ListIter {
-  ListNode *next;
-  int direction;
+    ListNode *next;
+    int direction;
 } ListIter;
 
 typedef struct List {
-  ListNode *head;
-  ListNode *tail;
+    ListNode *head;
+    ListNode *tail;
 
-  void *(*dup)(void *ptr);
+    void *(*dup)(void *ptr);
 
-  void (*free)(void *ptr);
+    void (*free)(void *ptr);
 
-  int (*match)(void *ptr, void *key);
+    int (*match)(void *ptr, void *key);
 
-  unsigned long len;
+    unsigned long len;
 } List;
 
 // list

@@ -40,7 +40,7 @@ int anetResolveIP(char *err, char *host, char *ipbuf, size_t *ipbuf_len);
 
 int anetTcpServer(char *err, int port, char *bindaddr, int backlog);
 
-int anetTco6Server(char *err, int port, char *bindaddr, int backlog);
+int anetTcp6Server(char *err, int port, char *bindaddr, int backlog);
 
 int anetUnixServer(char *err, char *path, mode_t perm, int backlog);
 
