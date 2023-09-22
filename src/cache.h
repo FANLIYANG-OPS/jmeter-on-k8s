@@ -171,7 +171,7 @@ typedef long long ms_time_t;
 #define CACHE_CLOSE_AFTER_REPLY (1 << 6)
 #define CACHE_UNBLOCKED (1 << 7)
 
-#define CAHCE_LUA_CLIENT (1 << 8)
+#define CACHE_LUA_CLIENT (1 << 8)
 #define CACHE_ASKING (1 << 9)
 #define CACHE_CLOSE_ASAP (1 << 10)
 #define CACHE_UNIX_SOCKET (1 << 11)
@@ -1088,7 +1088,7 @@ void stopLoading(void);
 
 void flushAppendOnlyFile(int force);
 
-void feedAooendOnlyFile(struct cacheCommand *cmd, int dictid, cobj *argv,
+void feedAppendOnlyFile(struct cacheCommand *cmd, int dictid, cobj **argv,
                         int argc);
 
 void aofRemoveTempFile(pid_t child_pid);
